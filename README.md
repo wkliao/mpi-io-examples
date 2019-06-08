@@ -2,6 +2,11 @@
 
 ### List of example programs
 * mpi_file_open.c
+  * Calls `MPI_File_open` function to create a new file.
+  * Calls `MPI_File_open` function to open an existing file.
+* mpi_tag_ub.c
+  * Obtains the value of attribute `MPI_TAG_UB` attached to communicator
+    `MPI_COMM_WORLD`. `MPI_TAG_UB` is the upper bound for tag value.
 
 ### To compile
 * Modify file `Makefile` if necessary to change the path of MPI C compiler.
