@@ -7,15 +7,15 @@
 
 #define MAX_TRIES 100000
 
-#define CHECK_ERR \
+#define CHECK_ERR(func) { \
     if (err != MPI_SUCCESS) { \
         int errorStringLen; \
         char errorString[MPI_MAX_ERROR_STRING]; \
         MPI_Error_string(err, errorString, &errorStringLen); \
         if (rank == 0) \
-            printf("Error at line %d: %s\n",__LINE__, errorString); \
-        break; /* loop i */ \
-    }
+            printf("Error at line %d: calling %s (%s)\n",__LINE__, #func, errorString); \
+    } \
+}
 
 int main(int argc, char** argv) {
     char *filename, buf[512];
@@ -24,8 +24,10 @@ int main(int argc, char** argv) {
     MPI_File fh;
 
     MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    err = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    CHECK_ERR(MPI_Comm_rank);
+    err = MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    CHECK_ERR(MPI_Comm_size);
 
     filename = "testfile";
     memset(buf, 0, 512);
@@ -45,21 +47,25 @@ int main(int argc, char** argv) {
 
         /* all processes must wait here until file deletion is completed */
         err = MPI_Bcast(&sys_err, 1, MPI_INT, 0, MPI_COMM_WORLD);
-        CHECK_ERR
+        CHECK_ERR(MPI_Bcast);
+        if (err != MPI_SUCCESS) break; /* loop i */
 
         if (sys_err != 0) break; /* loop i */
 
         /* all processes open the file in parallel */
         err = MPI_File_open(MPI_COMM_WORLD, filename, MPI_MODE_CREATE | MPI_MODE_RDWR, MPI_INFO_NULL, &fh);
-        CHECK_ERR
+        CHECK_ERR(MPI_File_open);
+        if (err != MPI_SUCCESS) break; /* loop i */
 
         if (rank == 0) { /* mimic PnetCDF rank 0 writes to file header */
             err = MPI_File_write(fh, buf, 512, MPI_BYTE, &status);
-            CHECK_ERR
+            CHECK_ERR(MPI_File_write);
+            if (err != MPI_SUCCESS) break; /* loop i */
         }
 
         err = MPI_File_close(&fh);
-        CHECK_ERR
+        CHECK_ERR(MPI_File_close);
+        if (err != MPI_SUCCESS) break; /* loop i */
     }
 
     MPI_Finalize();
