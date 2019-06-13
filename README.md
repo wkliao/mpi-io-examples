@@ -4,6 +4,8 @@
 * mpi_file_open.c
   * Calls `MPI_File_open` function to create a new file.
   * Calls `MPI_File_open` function to open an existing file.
+* mpi_file_set_view.c
+  * Set the visible file region to each process.
 * print_mpi_io_hints.c
   * Prints out all default MPI I/O hints.
 * mpi_tag_ub.c

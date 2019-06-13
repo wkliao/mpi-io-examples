@@ -10,6 +10,9 @@ LIBS		=
 
 all:
 
+mpi_file_set_view: mpi_file_set_view.o
+	$(MPICC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LIBS)
+
 mpi_file_open: mpi_file_open.o
 	$(MPICC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LIBS)
 
@@ -24,6 +27,7 @@ mpi_create_delete_loop: mpi_create_delete_loop.o
 
 clean:
 	rm -f core.* *.o testfile \
-	mpi_file_open mpi_create_delete_loop mpi_tag_ub print_mpi_io_hints
+	mpi_file_open mpi_create_delete_loop mpi_tag_ub print_mpi_io_hints \
+	mpi_file_set_view
 
 .PHONY: clean
