@@ -12,14 +12,7 @@
 #include <stdlib.h>
 #include <mpi.h>
 
-#define CHECK_ERR(func) { \
-    if (err != MPI_SUCCESS) { \
-        int errorStringLen; \
-        char errorString[MPI_MAX_ERROR_STRING]; \
-        MPI_Error_string(err, errorString, &errorStringLen); \
-        printf("Error at line %d: calling %s (%s)\n",__LINE__, #func, errorString); \
-    } \
-}
+#include "mpi_utils.h"
 
 int main(int argc, char **argv)
 {
@@ -27,11 +20,10 @@ int main(int argc, char **argv)
     int err, rank, tag_ub, isSet;
 
     MPI_Init(&argc,&argv);
-    err = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    CHECK_ERR(MPI_Comm_rank);
 
-    err = MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, &value, &isSet);
-    CHECK_ERR(MPI_Comm_get_attr);
+    MPI_CHECK_ERR( MPI_Comm_rank(MPI_COMM_WORLD, &rank) );
+
+    MPI_CHECK_ERR( MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, &value, &isSet) );
 
     tag_ub = *(int *) value;
     if (isSet)
@@ -40,6 +32,5 @@ int main(int argc, char **argv)
         printf("rank %d: attribute MPI_TAG_UB for MPI_COMM_WORLD is NOT set\n",rank);
 
     MPI_Finalize();
-    return 0; 
+    return 0;
 }
-

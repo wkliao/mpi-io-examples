@@ -4,4 +4,6 @@ mpi_file_open
 print_mpi_io_hints
 mpi_tag_ub
 mpi_create_delete_loop
+fileview_subarray
+ghost_cell
 testfile

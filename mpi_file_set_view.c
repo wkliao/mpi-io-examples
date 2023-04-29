@@ -15,14 +15,7 @@
 #include <stdlib.h>
 #include <mpi.h>
 
-#define CHECK_ERR(func) { \
-    if (err != MPI_SUCCESS) { \
-        int errorStringLen; \
-        char errorString[MPI_MAX_ERROR_STRING]; \
-        MPI_Error_string(err, errorString, &errorStringLen); \
-        printf("Error at line %d: calling %s (%s)\n",__LINE__, #func, errorString); \
-    } \
-}
+#include "mpi_utils.h"
 
 /*----< main() >------------------------------------------------------------*/
 int main(int argc, char **argv) {
@@ -34,16 +27,14 @@ int main(int argc, char **argv) {
 
     MPI_Init(&argc, &argv);
 
-    err = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    CHECK_ERR(MPI_Comm_rank);
+    MPI_CHECK_ERR( MPI_Comm_rank(MPI_COMM_WORLD, &rank) );
 
     filename = "testfile.out";
     if (argc > 1) filename = argv[1];
 
     /* open a file (create if the file does not exist) */
     cmode = MPI_MODE_CREATE | MPI_MODE_RDWR;
-    err = MPI_File_open(MPI_COMM_WORLD, filename, cmode, MPI_INFO_NULL, &fh);
-    CHECK_ERR(MPI_File_open);
+    MPI_CHECK_ERR( MPI_File_open(MPI_COMM_WORLD, filename, cmode, MPI_INFO_NULL, &fh) );
 
     /* initialize write buffer contents */
     for (i=0; i<10; i++) buf[i] = 100 * rank + i;
@@ -60,28 +51,22 @@ int main(int argc, char **argv) {
      * argument. In this example, the "file view" of a process is the entire
      * file starting from its offset.
      */
-    err = MPI_File_set_view(fh, offset, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
-    CHECK_ERR(MPI_File_set_view);
+    MPI_CHECK_ERR( MPI_File_set_view(fh, offset, MPI_INT, MPI_INT, "native", MPI_INFO_NULL) );
 
     /* Each process writes 3 integers to the file region visible to it.
      * Note the file pointer will advance 3x4 bytes after this call.
      */
-    err = MPI_File_write_all(fh, &buf[0], 3, MPI_INT, &status);
-    CHECK_ERR(MPI_File_set_view);
+    MPI_CHECK_ERR( MPI_File_write_all(fh, &buf[0], 3, MPI_INT, &status) );
 
     /* Each process continues to write next 7 integers to the file region
      * visible to it, starting from the file pointer updated from the previous
      * write call.
      */
-    err = MPI_File_write_all(fh, &buf[3], 7, MPI_INT, &status);
-    CHECK_ERR(MPI_File_set_view);
+    MPI_CHECK_ERR( MPI_File_write_all(fh, &buf[3], 7, MPI_INT, &status) );
 
     /* close the file collectively */
-    err = MPI_File_close(&fh);
-    CHECK_ERR(MPI_File_set_view);
+    MPI_CHECK_ERR( MPI_File_close(&fh) );
 
     MPI_Finalize();
     return 0;
 }
-
-

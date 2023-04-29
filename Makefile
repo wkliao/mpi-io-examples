@@ -20,4 +20,3 @@ clean:
 	rm -f core.* *.o testfile.out $(check_PROGRAMS)
 
 .PHONY: clean
-

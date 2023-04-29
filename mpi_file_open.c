@@ -11,14 +11,7 @@
 
 #define LEN 10
 
-#define CHECK_ERR(func) { \
-    if (err != MPI_SUCCESS) { \
-        int errorStringLen; \
-        char errorString[MPI_MAX_ERROR_STRING]; \
-        MPI_Error_string(err, errorString, &errorStringLen); \
-        printf("Error at line %d: calling %s (%s)\n",__LINE__, #func, errorString); \
-    } \
-}
+#include "mpi_utils.h"
 
 /*----< main() >------------------------------------------------------------*/
 int main(int argc, char **argv)
@@ -29,10 +22,8 @@ int main(int argc, char **argv)
     MPI_Info info;
 
     MPI_Init(&argc, &argv);
-    err = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    CHECK_ERR(MPI_Comm_rank);
-    err = MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-    CHECK_ERR(MPI_Comm_size);
+    MPI_CHECK_ERR( MPI_Comm_rank(MPI_COMM_WORLD, &rank) );
+    MPI_CHECK_ERR( MPI_Comm_size(MPI_COMM_WORLD, &nprocs) );
 
     filename = "testfile.out";
     if (argc > 1) filename = argv[1];
@@ -45,23 +36,19 @@ int main(int argc, char **argv)
     cmode |= MPI_MODE_WRONLY; /* with write-only permission */
 
     /* collectively open a file, shared by all processes in MPI_COMM_WORLD */
-    err = MPI_File_open(MPI_COMM_WORLD, filename, cmode, info, &fh);
-    CHECK_ERR(MPI_File_open to write);
+    MPI_CHECK_ERR( MPI_File_open(MPI_COMM_WORLD, filename, cmode, info, &fh) );
 
     /* collectively close the file */
-    err = MPI_File_close(&fh);
-    CHECK_ERR(MPI_File_close);
+    MPI_CHECK_ERR( MPI_File_close(&fh) );
 
     /* set file open mode */
     omode = MPI_MODE_RDONLY; /* with read-only permission */
 
     /* collectively open a file, shared by all processes in MPI_COMM_WORLD */
-    err = MPI_File_open(MPI_COMM_WORLD, filename, omode, info, &fh);
-    CHECK_ERR(MPI_File_open to read);
+    MPI_CHECK_ERR( MPI_File_open(MPI_COMM_WORLD, filename, omode, info, &fh) );
 
     /* collectively close the file */
-    err = MPI_File_close(&fh);
-    CHECK_ERR(MPI_File_close);
+    MPI_CHECK_ERR( MPI_File_close(&fh) );
 
 prog_exit:
     MPI_Finalize();
