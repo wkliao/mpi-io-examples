@@ -2,6 +2,7 @@
 #define MPI_UTILS_H_
 
 #include <mpi.h>
+#include <stdio.h>
 
 int mpi_check_error(int err,
                     char const *const func,
@@ -14,7 +15,7 @@ int mpi_check_error(int err,
         int errorStringLen;
         char errorString[MPI_MAX_ERROR_STRING];
         MPI_Error_string(err, errorString, &errorStringLen);
-        fprintf(stderr, "Error at line %d: calling %s (%s)\n",line, func, errorString);
+        fprintf(stderr, "Error at %s:%d: calling %s ==> %s\n",file, line, func, errorString);
     }
 
     return err;
