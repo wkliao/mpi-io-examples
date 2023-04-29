@@ -42,23 +42,17 @@
  * MPI File Info: [22] key =       romio_filesystem_type, flag = 1, valuelen = 10 value = CRAY ADIO:
  *  */
 
-#define CHECK_ERR(func) { \
-    if (err != MPI_SUCCESS) { \
-        int errorStringLen; \
-        char errorString[MPI_MAX_ERROR_STRING]; \
-        MPI_Error_string(err, errorString, &errorStringLen); \
-        printf("Error at line %d: calling %s (%s)\n",__LINE__, #func, errorString); \
-    } \
-}
+#include "mpi_utils.h"
 
 /*----< main() >------------------------------------------------------------*/
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+
     int      i, err, rank, nkeys;
     MPI_File fh;
 
     MPI_Init(&argc, &argv);
-    err = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    CHECK_ERR(MPI_Comm_rank);
+    MPI_CHECK_ERR( MPI_Comm_rank(MPI_COMM_WORLD, &rank) );
 
     if (argc != 2) {
         printf("Usage: %s filename\n",argv[0]);
@@ -67,48 +61,40 @@ int main(int argc, char **argv) {
     }
 
     /* create a new file */
-    err = MPI_File_open(MPI_COMM_WORLD, argv[1], MPI_MODE_CREATE | MPI_MODE_RDWR,
-                        MPI_INFO_NULL, &fh);
-    CHECK_ERR(MPI_File_open);
-
+    MPI_CHECK_ERR( MPI_File_open(MPI_COMM_WORLD, argv[1], MPI_MODE_CREATE | MPI_MODE_RDWR,
+                                 MPI_INFO_NULL, &fh) );
     if (rank == 0) {
         MPI_Info info_used;
 
         /* get info object set by the MPI library */
-        err = MPI_File_get_info(fh, &info_used);
-        CHECK_ERR(MPI_Comm_rank);
+        MPI_CHECK_ERR( MPI_File_get_info(fh, &info_used) );
 
         /* find the number of hints set in the info object */
-        err = MPI_Info_get_nkeys(info_used, &nkeys);
-        CHECK_ERR(MPI_Info_get_nkeys);
+        MPI_CHECK_ERR( MPI_Info_get_nkeys(info_used, &nkeys) );
         printf("MPI File Info: nkeys = %d\n",nkeys);
 
         for (i=0; i<nkeys; i++) {
             /* for each hint, find the (key, value) pairs */
-	    char key[MPI_MAX_INFO_KEY], value[MPI_MAX_INFO_VAL];
-	    int  valuelen, flag;
+            char key[MPI_MAX_INFO_KEY], value[MPI_MAX_INFO_VAL];
+            int  valuelen, flag;
 
             /* get the ith key */
-            err = MPI_Info_get_nthkey(info_used, i, key);
-            CHECK_ERR(MPI_Info_get_nthkey);
+            MPI_CHECK_ERR( MPI_Info_get_nthkey(info_used, i, key) );
 
             /* get the string length of the ith key */
-	    err = MPI_Info_get_valuelen(info_used, key, &valuelen, &flag);
-            CHECK_ERR(MPI_Info_get_valuelen);
+            MPI_CHECK_ERR( MPI_Info_get_valuelen(info_used, key, &valuelen, &flag) );
 
             /* get the value of ith key */
-	    err = MPI_Info_get(info_used, key, valuelen+1, value, &flag);
-            CHECK_ERR(MPI_Info_get);
+            MPI_CHECK_ERR( MPI_Info_get(info_used, key, valuelen+1, value, &flag) );
 
             printf("MPI File Info: [%2d] key = %27s, flag = %d, valuelen = %d value = %s\n",
-	           i,key,flag,valuelen,value);
+                   i,key,flag,valuelen,value);
         }
-        err = MPI_Info_free(&info_used);
-        CHECK_ERR(MPI_Info_free);
+        MPI_CHECK_ERR( MPI_Info_free(&info_used) );
     }
+
     /* close the file */
-    err = MPI_File_close(&fh);
-    CHECK_ERR(MPI_File_close);
+    MPI_CHECK_ERR( MPI_File_close(&fh) );
 
     MPI_Finalize();
     return 0;

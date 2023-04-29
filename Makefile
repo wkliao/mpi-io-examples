@@ -5,7 +5,7 @@ CFLAGS          = -O0 -g
 LDFLAGS		=
 LIBS		=
 
-.c.o:
+%.o: %.c mpi_utils.h
 	$(MPICC) $(CFLAGS) $(INCLUDES) -c $<
 
 all:
