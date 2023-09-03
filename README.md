@@ -32,6 +32,10 @@
 * [OpenMPI](https://www.open-mpi.org), an implementation of MPI standard
 * Book - [MPI: The Complete Reference](http://www.netlib.org/utk/papers/mpi-book/mpi-book.html)
 
+### Current build status
+* Github Actions: [![MPICH](https://github.com/wkliao/mpi-io-examples/actions/workflows/mpich.yaml/badge.svg)](https://github.com/wkliao/mpi-io-examples/actions/workflows/mpich.yaml)
+[![OpenMPI](https://github.com/wkliao/mpi-io-examples/actions/workflows/openmpi.yaml/badge.svg)](https://github.com/wkliao/mpi-io-examples/actions/workflows/openmpi.yaml)
+
 ## Questions/Comments:
 email: wkliao@eecs.northwestern.edu
 

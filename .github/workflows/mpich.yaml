@@ -1,4 +1,4 @@
-name: mpich
+name: MPICH
 
 on:
   push:
