@@ -57,8 +57,8 @@ int main(int argc, char **argv) {
      * MPI_INT means a contiguous 4-byte region (assuming integer size if 4
      * bytes) is recursively applied to the file to form the visible region to
      * the calling process, starting from its "offset" set in the offset
-     * argument. In this example, the "file view" of a process is the entire file
-     * starting from its offset.
+     * argument. In this example, the "file view" of a process is the entire
+     * file starting from its offset.
      */
     err = MPI_File_set_view(fh, offset, MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
     CHECK_ERR(MPI_File_set_view);

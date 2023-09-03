@@ -11,6 +11,10 @@
 * mpi_tag_ub.c
   * Obtains the value of attribute `MPI_TAG_UB` attached to communicator
     `MPI_COMM_WORLD`. `MPI_TAG_UB` is the upper bound for tag value.
+* fileview_subarray.c
+  * Uses MPI_Type_create_subarray() to create an MPI derived data type of a 2D
+    subarray to a 2D global array, which is then used in the call to
+    MPI_File_set_view().
 
 ### To compile
 * Modify file `Makefile` if necessary to change the path of MPI C compiler.
