@@ -85,7 +85,7 @@ usage(char *argv0)
     "       [-l len] size of each dimension of the local array (default: 4)\n"
     "       [-c num] number of ghost cells along each dimension (default: 2) \n"
     "       [-n num] write count of buffer data type (default: 2) \n"
-    "       [filename] output file name (default: testfile.dat)\n";
+    "       [filename] output file name (default: testfie.out)\n";
     fprintf(stderr, help, argv0);
 }
 
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
                       MPI_Finalize();
                       return 1;
         }
-    if (argv[optind] == NULL) strcpy(filename, "testfile.nc");
+    if (argv[optind] == NULL) strcpy(filename, "testfie.out");
     else                      snprintf(filename, 256, "%s", argv[optind]);
 
     len = (len <= 0) ? 4 : len;
@@ -162,7 +162,7 @@ int main(int argc, char **argv)
     gsizes[0] = len * psizes[0]; /* global array size */
     gsizes[1] = len * psizes[1];
     if (verbose && rank == 0)
-        printf("global variable shape:     %lld %lld\n", gsizes[0],gsizes[1]);
+        printf("global variable shape:     %d %d\n", gsizes[0],gsizes[1]);
 
     /* create fileview data type */
     starts[0]   = local_rank[0] * len;

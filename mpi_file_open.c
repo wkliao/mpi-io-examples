@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     err = MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
     CHECK_ERR(MPI_Comm_size);
 
-    filename = "testfile";
+    filename = "testfile.out";
     if (argc > 1) filename = argv[1];
 
     /* Users can set customized I/O hints in info object */

@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     err = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     CHECK_ERR(MPI_Comm_rank);
 
-    filename = "testfile";
+    filename = "testfile.out";
     if (argc > 1) filename = argv[1];
 
     /* open a file (create if the file does not exist) */

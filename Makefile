@@ -17,7 +17,7 @@ check: all
 	./test.sh 4 || exit 1
 
 clean:
-	rm -f core.* *.o testfile $(check_PROGRAMS)
+	rm -f core.* *.o testfile.out $(check_PROGRAMS)
 
 .PHONY: clean
 
