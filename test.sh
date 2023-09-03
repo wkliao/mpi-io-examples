@@ -7,7 +7,7 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-MPIRUN="mpiexec -n 4"
+MPIRUN="mpiexec ${MPIRUN_OPTS} -n 4"
 
 for f in ${check_PROGRAMS} ; do
     if test "$f" = "print_mpi_io_hints" ; then

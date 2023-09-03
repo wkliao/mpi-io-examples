@@ -1,0 +1,40 @@
+name: OpenMPI
+
+on:
+  push:
+    branches: master
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  pull_request:
+    branches: master
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      timeout-minutes: 60
+      steps:
+        - uses: actions/checkout@v3
+        - name: Set up dependencies
+          run: |
+            sudo apt-get update
+            sudo apt-get install openmpi-bin openmpi-common libopenmpi-dev
+            echo "---- location of OpenMPI C compiler ----"
+            which mpicc
+        - name: Compile all test programs
+          run: |
+            cd ${GITHUB_WORKSPACE}
+            make -j 8
+        - name: make check
+          run: |
+            cd ${GITHUB_WORKSPACE}
+            make check MPIRUN_OPTS="--oversubscribe"
+        - name: Cleanup
+          if: ${{ always() }}
+          run: |
+            cd ${GITHUB_WORKSPACE}
+            make clean
+
