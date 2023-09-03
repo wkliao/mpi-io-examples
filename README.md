@@ -15,6 +15,12 @@
   * Uses MPI_Type_create_subarray() to create an MPI derived data type of a 2D
     subarray to a 2D global array, which is then used in the call to
     MPI_File_set_view().
+* ghost_cell.c
+  * Writes a 2D local array with ghost cells to a global array in a file. Ghost
+    cells are the elements in the local array that are not written to the file.
+    This example shows how to define an MPI derived data type to describe a 2D
+    subarray with ghost cells used it in I/O.
+
 
 ### To compile
 * Modify file `Makefile` if necessary to change the path of MPI C compiler.
