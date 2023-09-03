@@ -1,6 +1,6 @@
-/*********************************************************************
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  Copyright (C) 2019, Northwestern University
+ *  Copyright (C) 2023, Northwestern University
  *  See COPYRIGHT notice in top-level directory.
  *
  * This program shows an example of calling MPI_Type_create_subarray() to
@@ -12,7 +12,7 @@
  * function calls can read and write the visible region as if they are
  * contiguous in file.
  *
- *********************************************************************/
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <stdio.h>
 #include <stdlib.h>
