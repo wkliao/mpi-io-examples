@@ -65,10 +65,12 @@ jobs:
         - name: Compile all test programs
           run: |
             cd ${GITHUB_WORKSPACE}
+            export PATH="${GITHUB_WORKSPACE}/MPICH/bin:${PATH}"
             make -j 8
         - name: make check
           run: |
             cd ${GITHUB_WORKSPACE}
+            export PATH="${GITHUB_WORKSPACE}/MPICH/bin:${PATH}"
             make check
         - name: Cleanup
           if: ${{ always() }}
