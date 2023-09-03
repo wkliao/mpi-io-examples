@@ -1,0 +1,79 @@
+name: mpich
+
+on:
+  push:
+    branches: master
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  pull_request:
+    branches: master
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+
+env:
+   MPICH_VERSION: 4.1.2
+
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      timeout-minutes: 60
+      steps:
+        - uses: actions/checkout@v3
+        - name: Set up dependencies
+          run: |
+            sudo apt-get update
+            sudo apt-get install automake autoconf libtool libtool-bin m4
+            # install gfortran
+            version=12
+            sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+            sudo apt-get update
+            sudo apt-get install -y gcc-${version} gfortran-${version}
+            sudo update-alternatives \
+              --install /usr/bin/gcc gcc /usr/bin/gcc-${version} 100 \
+              --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${version} \
+              --slave /usr/bin/gcov gcov /usr/bin/gcov-${version}
+            echo "---- gcc/gfortran version ------------------------------"
+            which gcc
+            which gfortran
+            gcc --version
+            gfortran --version
+        - name: Build MPICH
+          run: |
+            cd ${GITHUB_WORKSPACE}
+            echo "Install MPICH ${MPICH_VERSION} in ${GITHUB_WORKSPACE}/MPICH"
+            rm -rf MPICH ; mkdir MPICH ; cd MPICH
+            # git clone -q https://github.com/pmodels/mpich.git
+            # cd mpich
+            # git submodule update --init
+            # ./autogen.sh
+            wget -q https://www.mpich.org/static/downloads/${MPICH_VERSION}/mpich-${MPICH_VERSION}.tar.gz
+            gzip -dc mpich-${MPICH_VERSION}.tar.gz | tar -xf -
+            cd mpich-${MPICH_VERSION}
+            ./configure --prefix=${GITHUB_WORKSPACE}/MPICH \
+                        --silent \
+                        --enable-romio \
+                        --with-file-system=ufs \
+                        --with-device=ch3:sock \
+                        --disable-fortran \
+                        CC=gcc FC=gfortran \
+                        FFLAGS=-fallow-argument-mismatch \
+                        FCFLAGS=-fallow-argument-mismatch
+            make -s LIBTOOLFLAGS=--silent V=1 -j 4 install > qout 2>&1
+            make -s -j 4 distclean >> qout 2>&1
+        - name: Compile all test programs
+          run: |
+            cd ${GITHUB_WORKSPACE}
+            make -j 8
+        - name: make check
+          run: |
+            cd ${GITHUB_WORKSPACE}
+            make check
+        - name: Cleanup
+          if: ${{ always() }}
+          run: |
+            cd ${GITHUB_WORKSPACE}
+            make clean
+            rm -rf ${GITHUB_WORKSPACE}/MPICH
+
