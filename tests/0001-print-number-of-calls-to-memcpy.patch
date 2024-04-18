@@ -1,0 +1,50 @@
+From 82487c29f5737b8f4c959a8dfc148d52deed0c51 Mon Sep 17 00:00:00 2001
+From: wkliao <wkliao@users.noreply.github.com>
+Date: Thu, 18 Apr 2024 15:44:46 -0500
+Subject: [PATCH] print number of calls to memcpy()
+
+---
+ src/mpi/romio/adio/common/ad_write_coll.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/mpi/romio/adio/common/ad_write_coll.c b/src/mpi/romio/adio/common/ad_write_coll.c
+index 2b7ed69f..84c5875d 100644
+--- a/src/mpi/romio/adio/common/ad_write_coll.c
++++ b/src/mpi/romio/adio/common/ad_write_coll.c
+@@ -10,6 +10,8 @@
+ #include "mpe.h"
+ #endif
+ 
++static int num_memcpy;
++
+ /* prototypes of functions used for collective writes only. */
+ static void ADIOI_Exch_and_write(ADIO_File fd, void *buf, MPI_Datatype
+                                  datatype, int nprocs, int myrank,
+@@ -78,6 +80,7 @@ void ADIOI_GEN_WriteStridedColl(ADIO_File fd, const void *buf, MPI_Aint count,
+     ADIO_Offset *len_list = NULL;
+     int old_error, tmp_error;
+ 
++num_memcpy = 0;
+     if (fd->hints->cb_pfr != ADIOI_HINT_DISABLE) {
+         /* Cast away const'ness as the below function is used for read
+          * and write */
+@@ -247,6 +250,8 @@ void ADIOI_GEN_WriteStridedColl(ADIO_File fd, const void *buf, MPI_Aint count,
+ #ifdef AGGREGATION_PROFILE
+     MPE_Log_event(5013, 0, NULL);
+ #endif
++
++if (fd->is_agg) printf("rank %d: %s number of memcpy called = %d\n",myrank,__func__,num_memcpy);
+ }
+ 
+ 
+@@ -791,6 +796,7 @@ static void ADIOI_W_Exchange_data(ADIO_File fd, void *buf, char *write_buf,
+   ADIOI_Assert(size_in_buf == (size_t)size_in_buf); \
+         memcpy(&(send_buf[p][send_buf_idx[p]]), \
+                ((char *) buf) + user_buf_idx, size_in_buf); \
++num_memcpy++; \
+         send_buf_idx[p] += size_in_buf; \
+         user_buf_idx += size_in_buf; \
+         flat_buf_sz -= size_in_buf; \
+-- 
+2.39.3
+
