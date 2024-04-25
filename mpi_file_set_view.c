@@ -67,18 +67,18 @@ int main(int argc, char **argv) {
      * Note the file pointer will advance 3x4 bytes after this call.
      */
     err = MPI_File_write_all(fh, &buf[0], 3, MPI_INT, &status);
-    CHECK_ERR(MPI_File_set_view);
+    CHECK_ERR(MPI_File_write_all);
 
     /* Each process continues to write next 7 integers to the file region
      * visible to it, starting from the file pointer updated from the previous
      * write call.
      */
     err = MPI_File_write_all(fh, &buf[3], 7, MPI_INT, &status);
-    CHECK_ERR(MPI_File_set_view);
+    CHECK_ERR(MPI_File_write_all);
 
     /* close the file collectively */
     err = MPI_File_close(&fh);
-    CHECK_ERR(MPI_File_set_view);
+    CHECK_ERR(MPI_File_close);
 
     MPI_Finalize();
     return 0;

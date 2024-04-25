@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 
         /* get info object set by the MPI library */
         err = MPI_File_get_info(fh, &info_used);
-        CHECK_ERR(MPI_Comm_rank);
+        CHECK_ERR(MPI_File_get_info);
 
         /* find the number of hints set in the info object */
         err = MPI_Info_get_nkeys(info_used, &nkeys);

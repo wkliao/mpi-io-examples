@@ -66,14 +66,15 @@
 
 #define EXPECT(rank,x) (rank)
 
-#define ERR \
+#define CHECK_ERR(func) { \
     if (err != MPI_SUCCESS) { \
         int errorStringLen; \
         char errorString[MPI_MAX_ERROR_STRING]; \
         MPI_Error_string(err, errorString, &errorStringLen); \
-        printf("Error at line %d: %s\n",__LINE__,errorString); \
+        printf("Error at line %d: calling %s (%s)\n",__LINE__, #func, errorString); \
         nerrs++; \
-    }
+    } \
+}
 
 static void
 usage(char *argv0)
@@ -148,7 +149,8 @@ int main(int argc, char **argv)
 
     /* calculate number of processes along each dimension */
     psizes[0] = psizes[1] = 0;
-    MPI_Dims_create(nprocs, 2, psizes);
+    err = MPI_Dims_create(nprocs, 2, psizes);
+    CHECK_ERR(MPI_Dims_create)
     if (verbose && rank == 0)
         printf("process dimension psizes = %d %d\n", psizes[0], psizes[1]);
 
@@ -171,12 +173,15 @@ int main(int argc, char **argv)
     subsizes[1] = len;
     err = MPI_Type_create_subarray(2, gsizes, subsizes, starts, MPI_ORDER_C,
                                    MPI_INT, &file_type);
-    ERR
+    CHECK_ERR(MPI_Type_create_subarray)
+
     err = MPI_Type_commit(&file_type);
-    ERR
+    CHECK_ERR(MPI_Type_commit)
 
     if (!rank) gstarts = (int*) malloc(nprocs * 2 * sizeof(int));
-    MPI_Gather(starts, 2, MPI_INT, gstarts, 2, MPI_INT, 0, MPI_COMM_WORLD);
+
+    err = MPI_Gather(starts, 2, MPI_INT, gstarts, 2, MPI_INT, 0, MPI_COMM_WORLD);
+    CHECK_ERR(MPI_Gather)
 
     MPI_Type_size(file_type, &type_size);
     MPI_Type_get_extent(file_type, &lb, &extent);
@@ -190,10 +195,10 @@ int main(int argc, char **argv)
     starts[1] = nghosts;
     err = MPI_Type_create_subarray(2, sizes, subsizes, starts, MPI_ORDER_C,
                                    MPI_INT, &buf_type);
-    ERR
+    CHECK_ERR(MPI_Type_create_subarray)
 
     err = MPI_Type_commit(&buf_type);
-    ERR
+    CHECK_ERR(MPI_Type_commit)
 
     MPI_Type_size(buf_type, &type_size);
     MPI_Type_get_extent(buf_type, &lb, &extent);
@@ -221,22 +226,23 @@ int main(int argc, char **argv)
     /* create the file */
     mode = MPI_MODE_CREATE | MPI_MODE_WRONLY;
     err = MPI_File_open(MPI_COMM_WORLD, filename, mode, info, &fh);
-    ERR
+    CHECK_ERR(MPI_File_open)
 
     /* set the file view */
     err = MPI_File_set_view(fh, off, MPI_BYTE, file_type, "native", info);
-    ERR
+    CHECK_ERR(MPI_File_set_view)
 
     /* write to the file */
     err = MPI_File_write_all(fh, buf, ntimes, buf_type, &status);
-    ERR
+    CHECK_ERR(MPI_File_write_all)
 
-    MPI_File_close(&fh);
+    err = MPI_File_close(&fh);
+    CHECK_ERR(MPI_File_close)
 
     err = MPI_Type_free(&file_type);
-    ERR
+    CHECK_ERR(MPI_Type_free)
     err = MPI_Type_free(&buf_type);
-    ERR
+    CHECK_ERR(MPI_Type_free)
 
     if (rank) goto err_out;
 
