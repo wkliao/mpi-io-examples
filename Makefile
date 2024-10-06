@@ -6,7 +6,10 @@ check_PROGRAMS = mpi_file_set_view \
                  print_mpi_io_hints \
                  mpi_tag_ub \
                  fileview_subarray \
-                 ghost_cell
+                 ghost_cell \
+                 indexed_fsize \
+                 hindexed_fsize \
+                 nvars
 
 all: $(check_PROGRAMS)
 

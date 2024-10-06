@@ -20,7 +20,20 @@
     cells are the elements in the local array that are not written to the file.
     This example shows how to define an MPI derived data type to describe a 2D
     subarray with ghost cells used it in I/O.
-
+* indexed_fsize.c
+  * Uses a file datatype constructed from multiple subarray datatypes
+    concatenated by MPI_Type_indexed(). Each variable is partitioned among
+    processes in a 2D block-block fashion. At the end, it checks the file size
+    whether or not it is expected.
+* hindexed_fsize.c
+  * Uses a file datatype constructed from multiple subarray datatypes
+    concatenated by MPI_Type_create_hindexed(). Each variable is partitioned
+    among processes in a 2D block-block fashion. At the end, it checks the file
+    size whether or not it is expected.
+* nvars.c
+  * Makes a single call to collective write and read by using a fileview of
+    concatenating multiple subarrays of variables stored in the file and each
+    variable is partitioned among processes in a 2D block-block fashion.
 
 ### To compile
 * Modify file `Makefile` if necessary to change the path of MPI C compiler.

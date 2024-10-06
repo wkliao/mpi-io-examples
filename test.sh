@@ -12,6 +12,12 @@ MPIRUN="mpiexec ${MPIRUN_OPTS} -n 4"
 for f in ${check_PROGRAMS} ; do
     if test "$f" = "print_mpi_io_hints" ; then
        OPTS="testfile"
+    elif test "$f" = "indexed_fsize" ; then
+       OPTS="-q -f testfile"
+    elif test "$f" = "nindexed_fsize" ; then
+       OPTS="-q -f testfile"
+    elif test "$f" = "nvars" ; then
+       OPTS="-q -r -f testfile"
     fi
     CMD="${MPIRUN} ./$f ${OPTS}"
     echo "==========================================================="
