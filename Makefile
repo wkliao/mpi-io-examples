@@ -9,7 +9,8 @@ check_PROGRAMS = mpi_file_set_view \
                  ghost_cell \
                  indexed_fsize \
                  hindexed_fsize \
-                 nvars
+                 nvars \
+                 struct_fsize
 
 all: $(check_PROGRAMS)
 

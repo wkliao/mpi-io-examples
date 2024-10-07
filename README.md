@@ -30,6 +30,9 @@
     concatenated by MPI_Type_create_hindexed(). Each variable is partitioned
     among processes in a 2D block-block fashion. At the end, it checks the file
     size whether or not it is expected.
+* struct_fsize.c
+  * Similar to indexed_fsize.c, but using MPI_Type_create_struct() to
+    concatenate multiple subarray datatypes.
 * nvars.c
   * Makes a single call to collective write and read by using a fileview of
     concatenating multiple subarrays of variables stored in the file and each

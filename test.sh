@@ -13,11 +13,13 @@ for f in ${check_PROGRAMS} ; do
     if test "$f" = "print_mpi_io_hints" ; then
        OPTS="testfile"
     elif test "$f" = "indexed_fsize" ; then
-       OPTS="-q -f testfile"
-    elif test "$f" = "nindexed_fsize" ; then
-       OPTS="-q -f testfile"
+       OPTS="-f testfile"
+    elif test "$f" = "hindexed_fsize" ; then
+       OPTS="-f testfile"
+    elif test "$f" = "struct_fsize" ; then
+       OPTS="-f testfile"
     elif test "$f" = "nvars" ; then
-       OPTS="-q -r -f testfile"
+       OPTS="-r -f testfile"
     fi
     CMD="${MPIRUN} ./$f ${OPTS}"
     echo "==========================================================="
