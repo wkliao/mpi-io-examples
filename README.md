@@ -37,6 +37,8 @@
   * Makes a single call to collective write and read by using a fileview of
     concatenating multiple subarrays of variables stored in the file and each
     variable is partitioned among processes in a 2D block-block fashion.
+* column-wise.c
+  * Uses a 2D column-wise data partitioning pattern to set a file view.
 
 ### To compile
 * Modify file `Makefile` if necessary to change the path of MPI C compiler.

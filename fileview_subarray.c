@@ -56,7 +56,7 @@ int main(int argc, char **argv)
     err = MPI_Dims_create(nprocs, 2, psizes);
     CHECK_ERR("MPI_Dims_create");
 
-    if (verbose) 
+    if (verbose)
         printf("rank %2d: psizes=%2d %2d\n", rank, psizes[0],psizes[1]);
 
     /* set local array sizes */
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     starts[0] = COL * (rank / psizes[1]);
     starts[1] = ROW * (rank % psizes[1]);
 
-    if (verbose) 
+    if (verbose)
         printf("rank %2d: gsizes=%2d %2d lsizes=%2d %2d starts=%2d %2d\n", rank,
                gsizes[0],gsizes[1],lsizes[0],lsizes[1],starts[0],starts[1]);
 
