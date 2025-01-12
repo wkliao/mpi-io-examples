@@ -1,7 +1,7 @@
 CC       = mpicc
 CFLAGS   = -O0 -g
 
-check_PROGRAMS = alltomany
+check_PROGRAMS = alltomany alltoallw
 
 all: $(check_PROGRAMS)
 
