@@ -71,6 +71,7 @@ int main(int argc, char **argv) {
     len = 48;
     ntimes = 1;
     ratio = 1;
+    max_num_recvers = nprocs;
 
     /* command-line arguments */
     while ((i = getopt (argc, argv, "hvasl:n:r:m:")) != EOF)
