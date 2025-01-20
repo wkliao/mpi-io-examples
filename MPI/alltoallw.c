@@ -128,13 +128,16 @@ void run_alltoallw(int  ntimes,
                    int *recvBuf)
 {
     int *sendPtr;
-    int i, j, err, nprocs, rank, num_recvers;
+    int i, j, err, nprocs, rank, num_recvers, bucket_len;
     int *sendCounts, *recvCounts, *sendDisps, *recvDisps;
     MPI_Datatype *sendTypes, *recvTypes;
-    double timing, maxt;
+    double start_t, end_t, timing[10], maxt[10];
+
+    bucket_len = ntimes / 10;
+    if (ntimes % 10) bucket_len++;
 
     MPI_Barrier(MPI_COMM_WORLD);
-    timing = MPI_Wtime();
+    timing[0] = MPI_Wtime();
 
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -176,6 +179,7 @@ void run_alltoallw(int  ntimes,
             printf("%2d send to %2d of %d\n",rank,i,sendCounts[i]);
     }
 
+    start_t = MPI_Wtime();
     sendPtr = sendBuf;
     for (i=0; i<ntimes; i++) {
         if (debug && is_receiver)
@@ -188,17 +192,28 @@ void run_alltoallw(int  ntimes,
 
         if (debug && is_receiver)
             check_recv_buf("alltoallw", len, gap, recvBuf);
+
+        if (i > 0 && i % bucket_len == 0) {
+            end_t = MPI_Wtime();
+            timing[i / bucket_len] = end_t - start_t;
+            start_t = end_t;
+        }
     }
+    end_t = MPI_Wtime();
+    timing[9] = end_t - start_t;
+    timing[0] = end_t - timing[0]; /* end-to-end time */
 
 err_out:
     free(sendTypes);
     free(sendCounts);
     free(sendDisps);
 
-    timing = MPI_Wtime() - timing;
-    MPI_Reduce(&timing, &maxt, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    if (rank == 0)
-        printf("Time for using MPI_alltoallw    = %.2f sec\n", maxt);
+    MPI_Reduce(&timing, &maxt, 10, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    if (rank == 0) {
+        printf("Time for using MPI_alltoallw    = %.2f sec\n", maxt[0]);
+        for (i=1; i<10; i++)
+            printf("\tTime bucket[%d] = %.2f sec\n", i, maxt[i]);
+    }
 }
 
 /* all-to-many personalized communication by calling MPI_Issend/Irecv() */
@@ -211,13 +226,16 @@ void run_async_send_recv(int  ntimes,
                          int *recvBuf)
 {
     int *sendPtr, *recvPtr;
-    int i, j, err, nprocs, rank, nreqs, num_recvers;
+    int i, j, err, nprocs, rank, nreqs, num_recvers, bucket_len;
     MPI_Request *reqs;
     MPI_Status *st;
-    double timing, maxt;
+    double start_t, end_t, timing[10], maxt[10];
+
+    bucket_len = ntimes / 10;
+    if (ntimes % 10) bucket_len++;
 
     MPI_Barrier(MPI_COMM_WORLD);
-    timing = MPI_Wtime();
+    timing[0] = MPI_Wtime();
 
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -227,6 +245,7 @@ void run_async_send_recv(int  ntimes,
     reqs = (MPI_Request*) malloc(sizeof(MPI_Request) * (nprocs + num_recvers));
     st = (MPI_Status*) malloc(sizeof(MPI_Status) * (nprocs + num_recvers));
 
+    start_t = MPI_Wtime();
     sendPtr = sendBuf;
     for (i=0; i<ntimes; i++) {
         if (debug && is_receiver)
@@ -262,16 +281,27 @@ void run_async_send_recv(int  ntimes,
 
         if (debug && is_receiver)
             check_recv_buf("issend/irecv", len, gap, recvBuf);
+
+        if (i > 0 && i % bucket_len == 0) {
+            end_t = MPI_Wtime();
+            timing[i / bucket_len] = end_t - start_t;
+            start_t = end_t;
+        }
     }
+    end_t = MPI_Wtime();
+    timing[9] = end_t - start_t;
+    timing[0] = end_t - timing[0]; /* end-to-end time */
 
 err_out:
     free(st);
     free(reqs);
 
-    timing = MPI_Wtime() - timing;
-    MPI_Reduce(&timing, &maxt, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    if (rank == 0)
-        printf("Time for using MPI_Issend/Irecv = %.2f sec\n", maxt);
+    MPI_Reduce(&timing, &maxt, 10, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    if (rank == 0) {
+        printf("Time for using MPI_Issend/Irecv = %.2f sec\n", maxt[0]);
+        for (i=1; i<10; i++)
+            printf("\tTime bucket[%d] = %.2f sec\n", i, maxt[i]);
+    }
 }
 
 /*----< usage() >------------------------------------------------------------*/
@@ -385,4 +415,5 @@ err_out:
     MPI_Finalize();
     return 0;
 }
+
 
